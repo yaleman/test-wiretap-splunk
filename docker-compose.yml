@@ -1,0 +1,19 @@
+---
+services:
+  nginx:
+    image: nginx:latest
+    volumes:
+     - type: bind
+       source: ./splunk-nginx.conf
+       target: /etc/nginx/conf.d/splunk-nginx.conf
+    ports:
+      - "8889:8889"
+
+  splunk:
+    image: splunk/splunk:9.2.0
+    platform: linux/x86_64
+    environment:
+      - "SPLUNK_START_ARGS=--accept-license"
+      - "SPLUNK_PASSWORD=HappyPuppy123"
+    ports:
+      - "8000:8000"
