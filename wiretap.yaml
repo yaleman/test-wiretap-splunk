@@ -1,0 +1,67 @@
+---
+redirectURL: http://localhost:8000
+port: 8888
+monitorPort: 9093
+webSocketPort: 9094
+hardValidation: false
+strictRedirectLocation: false
+ignoreRedirects:
+  - "**"
+variables:
+  splunkUser: "admin"
+  splunkPass: "changeme"
+  splunk: "https://localhost:8089"
+paths:
+  # This is workaround to fix issue where wiretap converts // to / in url path [BLUERIDGE-6300].
+  /en-US/splunkd/__raw/servicesNS/nobody/missioncontrol/configs/conf-inputs/retrieve_im_indicators:/main:
+    target: ${splunk}
+    secure: true
+    auth: "${splunkUser}:${splunkPass}"
+    headers:
+      drop:
+        - Origin
+        - Referer
+    pathRewrite:
+      "^/en-US/splunkd/__raw/servicesNS/nobody/missioncontrol/configs/conf-inputs/retrieve_im_indicators:/main": "servicesNS/-/missioncontrol/data/inputs/retrieve_im_indicators/main"
+  /en-US/splunkd/__raw/servicesNS/nobody/missioncontrol/*:
+    target: ${splunk}
+    secure: true
+    auth: "${splunkUser}:${splunkPass}"
+    headers:
+      drop:
+        - Origin
+        - Referer
+    pathRewrite:
+      "^/en-US/splunkd/__raw/servicesNS/nobody/": "servicesNS/-/"
+  /en-US/splunkd/services/*:
+    target: ${splunk}
+    secure: true
+    auth: "${splunkUser}:${splunkPass}"
+    headers:
+      drop:
+        - Origin
+        - Referer
+    pathRewrite:
+      "^/en-US/splunkd/services": "/services"
+  /services/*:
+    target: ${splunk}
+    secure: true
+    auth: "${splunkUser}:${splunkPass}"
+    headers:
+      drop:
+        - Origin
+        - Referer
+  /undefined/util/log/js:
+    target: ${splunk}
+    secure: true
+    auth: "${splunkUser}:${splunkPass}"
+    headers:
+      drop:
+        - Origin
+        - Referer
+    pathRewrite:
+      "^/undefined/$1": "/en-US/$1"
+# staticDir: packages/ui/dist
+# staticIndex: packages/ui/index.html
+# staticPaths:
+#   - /en-US/app/*
